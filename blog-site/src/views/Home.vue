@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center px-6">
+  <div class="flex flex-col items-center justify-center px-6 mb-6">
     <div class="flex flex-col md:flex-row items-center gap-10 max-w-6xl w-full border-b pb-10">
       <!-- Metin Alanı -->
       <div class="w-full md:w-1/2 space-y-5">
@@ -71,18 +71,18 @@
     </div>
   </div>
   <!--Card Alani-->
-  <div class="px-6 py-16 bg-[#fff2eb]">
+  <div class="bg-[#fff2eb]">
     <div class="max-w-6xl mx-auto">
       <h2 class="text-2xl md:text-3xl font-semibold mb-10 text-center text-[#1e352f]">
         Uzmanlık Alanlarım
       </h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="card in cards" :key="card.id" class="rounded-lg overflow-hidden">
-          <img :src="card.image" :alt="card.title" class="w-full h-48 object-contain" />
-          <div class="p-4">
-            <h3 class="text-lg font-semibold mb-2">{{ card.title }}</h3>
-            <p class="text-gray-600 text-sm">{{ card.description }}</p>
+        <div v-for="card in cards" :key="card.id" class="flex flex-col h-full">
+          <img :src="card.imageUrl" :alt="card.title" class="w-full aspect-[4/3] object-cover" />
+          <div class="p-4 flex flex-col justify-between flex-1">
+            <h3 class="text-lg font-semibold text-[#1e352f] mb-2">{{ card.title }}</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">{{ card.description }}</p>
           </div>
         </div>
       </div>
@@ -90,45 +90,17 @@
   </div>
 </template>
 <script setup>
-const cards = [
-  {
-    id: 1,
-    title: 'Bireysel Danışmanlık',
-    description:
-      'Kendinizi daha iyi tanımak ve yaşamınızı daha anlamlı kılmak için bireysel destek alın.',
-    image: '/src/assets/images/bireysel.png',
-  },
-  {
-    id: 2,
-    title: 'Aile Danışmanlığı',
-    description:
-      'Aile içi iletişimi güçlendirmek ve ilişkileri sağlıklı hale getirmek için destek alın.',
-    image: 'https://picsum.photos/400/250?random=2',
-  },
-  {
-    id: 3,
-    title: 'Çocuk & Ergen Danışmanlığı',
-    description: 'Çocuk ve gençlerin duygusal gelişimini destekleyen özel danışmanlık hizmetleri.',
-    image: '/src/assets/images/cocuk.png',
-  },
-  {
-    id: 4,
-    title: 'Online Seanslar',
-    description: 'Zaman ve mekandan bağımsız olarak güvenli online görüşmelerle destek alın.',
-    image: '/src/assets/images/online.png',
-  },
-  {
-    id: 5,
-    title: 'Eğitim Danışmanlığı',
-    description: 'Geleceğini planlarken profesyonel destek alarak güçlü adımlar at.',
-    image: '/src/assets/images/egitim.png',
-  },
-  {
-    id: 6,
-    title: 'Yaratıcı Drama ve Atölye Çalışmaları ',
-    description:
-      'Toplumun ruhsal sağlığı için özel eğitim ve seminerlerle farkındalık oluşturuyoruz.',
-    image: '/src/assets/images/drama.png',
-  },
-]
+import { ref, onMounted } from 'vue'
+import { db } from '@/firebase'
+import { collection, getDocs } from 'firebase/firestore'
+
+const cards = ref([])
+
+onMounted(async () => {
+  const querySnapshot = await getDocs(collection(db, 'trainings'))
+  cards.value = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }))
+})
 </script>
