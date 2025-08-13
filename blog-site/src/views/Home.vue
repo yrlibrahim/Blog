@@ -14,12 +14,9 @@
           <button
             class="group relative flex items-center gap-4 border border-gray-300 rounded-full px-6 py-3 bg-[#f9f7ef] text-black font-medium transition-all duration-500 overflow-hidden"
           >
-            <!-- Metin -->
             <span class="transition-all duration-500 pe-8 transform group-hover:translate-x-10">
               Ücretsiz Ön Seans
             </span>
-
-            <!-- Sağdan çıkan daire -->
             <span
               class="absolute right-2 w-10 h-10 rounded-full bg-[#FFDCDC] flex items-center justify-center transform transition-all duration-500 group-hover:translate-x-12"
             >
@@ -37,8 +34,6 @@
                 />
               </svg>
             </span>
-
-            <!-- Soldan giren daire -->
             <span
               class="absolute left-0 w-10 h-10 rounded-full bg-[#FFDCDC] flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500"
             >
@@ -61,46 +56,65 @@
       </div>
 
       <!-- Görsel Alanı -->
-      <div class="md:w-1/2 w-full">
+      <div class="md:w-1/2 w-full lg:ms-16">
         <img
-          src="https://picsum.photos/500/400"
+          src="../../public/images/adsız1.png"
           alt="Danışmanlık görseli"
-          class="rounded-lg shadow-lg w-full h-auto object-cover"
+          class="rounded-lg lg:h-136 shadow-lg"
         />
       </div>
     </div>
   </div>
-  <!--Card Alani-->
-  <div class="bg-[#fff2eb]">
-    <div class="max-w-6xl mx-auto">
+
+  <!-- Card Alanı -->
+  <div class="bg-[#fff2eb] py-12">
+    <div class="max-w-6xl mx-auto px-4">
       <h2 class="text-2xl md:text-3xl font-semibold mb-10 text-center text-[#1e352f]">
         Uzmanlık Alanlarım
       </h2>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="card in cards" :key="card.id" class="flex flex-col h-full">
-          <img :src="card.imageUrl" :alt="card.title" class="w-full aspect-[4/3] object-cover" />
-          <div class="p-4 flex flex-col justify-between flex-1">
-            <h3 class="text-lg font-semibold text-[#1e352f] mb-2">{{ card.title }}</h3>
-            <p class="text-gray-600 text-sm leading-relaxed">{{ card.description }}</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        <div
+          v-for="(alan, index) in uzmanliklar"
+          :key="index"
+          class="rounded-xl overflow-hidden hover:shadow-lg transition duration-300"
+        >
+          <img :src="alan.image" :alt="alan.title" class="w-full h-64" />
+          <div class="p-5">
+            <h3 class="text-lg font-semibold mb-2">{{ alan.title }}</h3>
+            <p class="text-gray-600 text-sm">{{ alan.description }}</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
+import { getDocs, collection, orderBy, query } from 'firebase/firestore'
 import { db } from '@/firebase'
-import { collection, getDocs } from 'firebase/firestore'
 
-const cards = ref([])
+const uzmanliklar = ref([])
+
+// Başlığa göre görsel eşleştirme
+const imageMap = {
+  'bireysel danışmanlık': 'bireysel.png',
+  'çocuk danışmanlığı': 'cocuk.png',
+  'yaratıcı drama ve atölye çalışmaları': 'drama.png',
+  'eğitim danışmanlığı': 'egitim.png',
+  'online danışmanlık': 'online.png',
+}
 
 onMounted(async () => {
-  const querySnapshot = await getDocs(collection(db, 'trainings'))
-  cards.value = querySnapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }))
+  const q = query(collection(db, 'uzmanliklar'))
+  const snap = await getDocs(q)
+  uzmanliklar.value = snap.docs.map((doc) => {
+    const data = doc.data()
+    return {
+      ...data,
+      image: `/images/${imageMap[data.title.toLowerCase()] || 'bireysel.png'}`,
+    }
+  })
 })
 </script>

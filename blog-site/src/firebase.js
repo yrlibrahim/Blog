@@ -1,29 +1,35 @@
 // src/firebase.js
-
-// Gerekli modüller
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+// 🔽 Firestore'u bu şekilde başlatacağız
+import { initializeFirestore } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
-import { getAnalytics } from 'firebase/analytics'
+import { getAnalytics, isSupported as analyticsSupported } from 'firebase/analytics'
 
-// Firebase konfigürasyonu
 const firebaseConfig = {
-  apiKey: 'AIzaSyCNs1JxAzvdpTJI99vPw13s6G1mJN9CEkc',
-  authDomain: 'danismanlik-websitesi.firebaseapp.com',
-  projectId: 'danismanlik-websitesi',
-  storageBucket: 'danismanlik-websitesi.appspot.com',
-  messagingSenderId: '1012610996029',
-  appId: '1:1012610996029:web:787722f9e25443a1d31754',
-  measurementId: 'G-P3W2PEGR64',
+  apiKey: 'AIzaSyB1DjNzoQKGfSifSFYU4jeS_6VvBqT-Nes',
+  authDomain: 'blogsite-ffa8a.firebaseapp.com',
+  projectId: 'blogsite-ffa8a',
+  storageBucket: 'blogsite-ffa8a.appspot.com', // ✅ düzeltilen kısım
+  messagingSenderId: '922907500398',
+  appId: '1:922907500398:web:80802c4ed9fee23be9ab7f',
+  measurementId: 'G-0MNS8GBQFY',
 }
 
-// Uygulamayı başlat
 const app = initializeApp(firebaseConfig)
 
-// Gerekli servisleri al
-const db = getFirestore(app)
-const storage = getStorage(app)
-const analytics = getAnalytics(app)
+// ✅ Ağ/uzantı sorunlarında 400 almamak için
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  // Eğer hala sorun olursa şunu deneyebilirsin:
+  // experimentalForceLongPolling: true,
+})
 
-// Export et
-export { db, storage }
+export const storage = getStorage(app)
+
+// Analytics sadece güvenli origin'de ve tarayıcıda çalışır
+export let analytics = null
+if (typeof window !== 'undefined') {
+  analyticsSupported().then((ok) => {
+    if (ok) analytics = getAnalytics(app)
+  })
+}

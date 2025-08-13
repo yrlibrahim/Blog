@@ -9,6 +9,7 @@ import { RouterLink, RouterView } from 'vue-router'
       class="flex flex-col md:flex-row items-center justify-around px-4 md:px-20 py-2 md:py-4 gap-2 md:gap-0"
     >
       <!-- Logo (her zaman ortada) -->
+
       <div class="shrink-0">
         <img src="./assets/logo2.png" class="h-16 md:h-20 mx-auto md:mx-0 object-contain" />
       </div>
